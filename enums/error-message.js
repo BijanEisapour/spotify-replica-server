@@ -1,6 +1,9 @@
-const Error = {
+const ErrorMessage = {
+    AUTHENTICATION_FAILED: 'Authentication failed.',
     USER_ID_REQUIRED: "The user's id is required.",
     USER_NOT_FOUND: 'Cannot find the user.',
+    USER_ALL_CREDENTIALS_REQUIRED: 'All credentials are required.',
+    USER_ALREADY_EXISTS: 'There is already a user with these credentials in the database.',
     SONG_ID_REQUIRED: "The song's id is required.",
     SONG_NOT_FOUND: 'Cannot find the song.',
     PAGE_SIZE_NOT_VALID: 'The page size is not valid.',
@@ -11,4 +14,4 @@ const Error = {
     SOMETHING_WENT_WRONG: 'Something went wrong.',
 };
 
-module.exports = {Error};
+module.exports = {ErrorMessage};

@@ -7,8 +7,8 @@ require('dotenv').config();
 // constants
 const PORT = process.env.PORT || 5000;
 const ROUTES = {
-    USER: require('./server/routes/user'),
-    SONG: require('./server/routes/song'),
+    USER: require('./routes/user'),
+    SONG: require('./routes/song'),
 };
 
 // variables
@@ -19,9 +19,6 @@ const app = express();
 // parse middlewares
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
-
-// static folder
-app.use(express.static('public'));
 
 // mysql
 const pool = mysql.createPool({
