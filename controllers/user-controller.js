@@ -1,6 +1,6 @@
 const {ErrorMessage} = require('../enums/error-message');
 
-const {createPool, hash, sendError} = require('../utils/controller-utils');
+const {createPool, createToken, hash, sendError} = require('../utils/controller-utils');
 
 const pool = createPool();
 
@@ -74,7 +74,7 @@ exports.register = (req, res) => {
                         connection.query(
                             'INSERT INTO user (username, email, first_name, last_name, password) VALUES ?',
                             [[[username, email, firstName, lastName, hashed]]],
-                            (err) => {
+                            (err, {insertId}) => {
                                 connection.release();
 
                                 if (err) {
@@ -82,7 +82,10 @@ exports.register = (req, res) => {
                                     return;
                                 }
 
-                                res.status(200).send();
+                                const token = createToken(insertId);
+                                res.cookie('jwt', token, {httpOnly: true});
+
+                                res.status(201).send({id: insertId});
                             }
                         );
                     });

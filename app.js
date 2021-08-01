@@ -1,8 +1,9 @@
 const express = require('express');
-const bodyParser = require('body-parser');
-const mysql = require('mysql');
+const cookieParser = require('cookie-parser');
 
 require('dotenv').config();
+
+const {createPool} = require('./utils/controller-utils');
 
 // constants
 const PORT = process.env.PORT || 5000;
@@ -17,19 +18,11 @@ const ROUTES = {
 const app = express();
 
 // parse middlewares
-app.use(bodyParser.urlencoded({extended: false}));
-app.use(bodyParser.json());
+app.use(express.json());
+app.use(cookieParser());
 
 // mysql
-const pool = mysql.createPool({
-    connectionLimit: 100,
-    host: process.env['DB_HOST'],
-    user: process.env['DB_USER'],
-    password: process.env['DB_PASS'],
-    database: process.env['DB_NAME'],
-});
-
-pool.getConnection((err, connection) => {
+createPool().getConnection((err, connection) => {
     if (err) throw err;
     console.log(`connected to database as ${connection.threadId}`);
 });
