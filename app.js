@@ -1,5 +1,4 @@
 const express = require('express');
-const handlerbars = require('express-handlebars');
 const bodyParser = require('body-parser');
 const mysql = require('mysql');
 
@@ -9,6 +8,7 @@ require('dotenv').config();
 const PORT = process.env.PORT || 5000;
 const ROUTES = {
     USER: require('./server/routes/user'),
+    SONG: require('./server/routes/song'),
 };
 
 // variables
@@ -43,5 +43,6 @@ app.get('', (req, res) => {
 });
 
 app.use('/user', ROUTES.USER);
+app.use('/song', ROUTES.SONG);
 
 app.listen(PORT, () => console.log(`listening on port ${PORT} ...`));
