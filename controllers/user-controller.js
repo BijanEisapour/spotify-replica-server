@@ -39,6 +39,29 @@ exports.one = (req, res) => {
     });
 };
 
+exports.auth = (req, res) => {
+    const token = req.cookies['jwt'];
+
+    if (!token) {
+        sendError(res, ErrorMessage.AUTHENTICATION_FAILED, 401);
+        return;
+    }
+
+    verifyToken(token, (err, decodedToken) => {
+        if (err) {
+            sendError(res, ErrorMessage.AUTHENTICATION_FAILED, 401);
+            return;
+        }
+
+        res.send({id: decodedToken.id});
+    });
+};
+
+exports.logout = (req, res) => {
+    res.cookie('jwt', '', {maxAge: 1});
+    res.send();
+};
+
 exports.register = (req, res) => {
     const {username, email, firstName, lastName, password} = req.body;
 
@@ -135,7 +158,7 @@ exports.login = (req, res) => {
 
                 hashCompare(password, user.password, (err, result) => {
                     if (err || !result) {
-                        sendError(res, ErrorMessage.AUTHENTICATION_FAILED, 400);
+                        sendError(res, ErrorMessage.AUTHENTICATION_FAILED, 401);
                         return;
                     }
 
@@ -146,23 +169,5 @@ exports.login = (req, res) => {
                 });
             }
         );
-    });
-};
-
-exports.auth = (req, res) => {
-    const token = req.cookies['jwt'];
-
-    if (!token) {
-        sendError(res, ErrorMessage.AUTHENTICATION_FAILED, 400);
-        return;
-    }
-
-    verifyToken(token, (err) => {
-        if (err) {
-            sendError(res, ErrorMessage.AUTHENTICATION_FAILED, 400);
-            return;
-        }
-
-        res.send();
     });
 };
