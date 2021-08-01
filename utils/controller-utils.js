@@ -25,13 +25,23 @@ const hash = (word, callback) => {
     });
 };
 
+const hashCompare = (word, hashed, callback) => {
+    bcrypt.compare(word, hashed, callback);
+};
+
 const sendError = (res, message, status) => {
     res.status(status).send({error: message});
+};
+
+const verifyToken = (token, callback) => {
+    jwt.verify(token, process.env.JWT_SECRET, callback);
 };
 
 module.exports = {
     createPool,
     createToken,
     hash,
+    hashCompare,
     sendError,
+    verifyToken,
 };
