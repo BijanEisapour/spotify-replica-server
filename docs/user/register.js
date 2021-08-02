@@ -1,50 +1,40 @@
 module.exports = {
     post: {
         tags: ['user'],
-        description: 'Registers the user',
+        description: 'Registers the user; "firstName" and "lastName" are optional',
         operationId: 'userPostRegister',
-        parameters: [
-            {
-                name: 'username',
-                in: 'body',
-                schema: {
-                    $ref: '#/components/schemas/username',
+        requestBody: {
+            content: {
+                'application/json': {
+                    schema: {
+                        type: 'object',
+                        properties: {
+                            username: {
+                                type: 'string',
+                                example: 'BijanProgrammer',
+                            },
+                            email: {
+                                type: 'string',
+                                example: 'bijaneisapour@gmail.com',
+                            },
+                            password: {
+                                type: 'string',
+                                example: '1234',
+                            },
+                            firstName: {
+                                type: 'string',
+                                example: 'بیژن',
+                            },
+                            lastName: {
+                                type: 'string',
+                                example: 'عیسی پور',
+                            },
+                        },
+                        required: ['username', 'email', 'password'],
+                    },
                 },
-                required: true,
             },
-            {
-                name: 'email',
-                in: 'body',
-                schema: {
-                    $ref: '#/components/schemas/email',
-                },
-                required: true,
-            },
-            {
-                name: 'password',
-                in: 'body',
-                schema: {
-                    $ref: '#/components/schemas/password',
-                },
-                required: true,
-            },
-            {
-                name: 'firstName',
-                in: 'body',
-                schema: {
-                    $ref: '#/components/schemas/firstName',
-                },
-                required: false,
-            },
-            {
-                name: 'lastName',
-                in: 'body',
-                schema: {
-                    $ref: '#/components/schemas/lastName',
-                },
-                required: false,
-            },
-        ],
+        },
         responses: {
             200: {
                 description: 'User created successfully',

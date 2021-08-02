@@ -59,6 +59,7 @@ exports.register = (req, res) => {
     const {username, email, firstName, lastName, password} = req.body;
 
     if (!username || !email || !password) {
+        console.log({username, email, firstName, lastName, password});
         sendError(res, ErrorMessage.USER_ALL_CREDENTIALS_REQUIRED, 400);
         return;
     }
