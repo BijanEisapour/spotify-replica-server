@@ -1,6 +1,6 @@
 const express = require('express');
 const cookieParser = require('cookie-parser');
-var cors = require('cors');
+const cors = require('cors');
 const swaggerUi = require('swagger-ui-express');
 const docs = require('./docs');
 
@@ -15,8 +15,6 @@ const ROUTES = {
     SONG: require('./routes/song'),
     PLAYLIST: require('./routes/playlist'),
 };
-
-// variables
 
 // init app
 const app = express();
