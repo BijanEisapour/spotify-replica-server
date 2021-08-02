@@ -106,10 +106,6 @@ module.exports = {
                         type: 'string',
                         example: 'some url',
                     },
-                    liked: {
-                        type: 'boolean',
-                        example: '1',
-                    },
                 },
             },
             SongArray: {
