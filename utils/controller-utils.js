@@ -16,8 +16,11 @@ const createPool = () => {
 
 const pool = createPool();
 
-const createToken = (id) => {
-    return jwt.sign({id}, process.env.JWT_SECRET);
+const createAndSendToken = (res, id) => {
+    const token = jwt.sign({id}, process.env.JWT_SECRET);
+    res.cookie('jwt', token, {httpOnly: true, maxAge: 365 * 24 * 60 * 60});
+
+    res.status(201).send({id});
 };
 
 const hash = (word, callback) => {
@@ -82,7 +85,7 @@ const verifyTokenQuery = (req, res, queryString, queryOptions, callback) => {
 };
 
 module.exports = {
-    createToken,
+    createAndSendToken,
     hash,
     hashCompare,
     query,

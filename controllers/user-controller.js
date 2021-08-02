@@ -1,8 +1,6 @@
 const {ErrorMessage} = require('../enums/error-message');
 
-const {createPool, createToken, hash, hashCompare, sendError, verifyToken} = require('../utils/controller-utils');
-
-const pool = createPool();
+const {createAndSendToken, hash, hashCompare, query, sendError, verifyToken} = require('../utils/controller-utils');
 
 exports.one = (req, res) => {
     const {id} = req.params;
@@ -12,30 +10,16 @@ exports.one = (req, res) => {
         return;
     }
 
-    pool.getConnection((err, connection) => {
-        if (err) {
-            sendError(res, ErrorMessage.DATABASE, 500);
+    query(res, 'SELECT * FROM user WHERE id = ?', id, (rows) => {
+        if (!rows || rows.length === 0) {
+            sendError(res, ErrorMessage.USER_NOT_FOUND, 404);
             return;
         }
 
-        connection.query('SELECT * FROM user WHERE id = ?', id, (err, rows) => {
-            connection.release();
+        const user = rows[0];
+        delete user.password;
 
-            if (err) {
-                sendError(res, ErrorMessage.SOMETHING_WENT_WRONG, 500, err);
-                return;
-            }
-
-            if (!rows || rows.length === 0) {
-                sendError(res, ErrorMessage.USER_NOT_FOUND, 404);
-                return;
-            }
-
-            const user = rows[0];
-            delete user.password;
-
-            res.json({user});
-        });
+        res.json({user});
     });
 };
 
@@ -58,56 +42,24 @@ exports.register = (req, res) => {
         return;
     }
 
-    pool.getConnection((err, connection) => {
-        if (err) {
-            sendError(res, ErrorMessage.DATABASE, 500);
+    const query1 = 'SELECT * FROM user WHERE username = ? OR email = ?';
+    const query2 = 'INSERT INTO user (username, email, first_name, last_name, password) VALUES ?';
+
+    query(res, query1, [username, email], (rows) => {
+        if (rows.length > 0) {
+            sendError(res, ErrorMessage.USER_ALREADY_EXISTS, 400);
             return;
         }
 
-        connection.query('SELECT * FROM user WHERE username = ? OR email = ?', [username, email], (err, rows) => {
-            connection.release();
-
-            if (err) {
-                sendError(res, ErrorMessage.SOMETHING_WENT_WRONG, 500, err);
-                return;
-            }
-
-            if (rows.length > 0) {
-                sendError(res, ErrorMessage.USER_ALREADY_EXISTS, 400);
-                return;
-            }
-
-            pool.getConnection((err, connection) => {
-                if (err) {
-                    sendError(res, ErrorMessage.DATABASE, 500);
-                    return;
-                }
-
-                try {
-                    hash(password, (hashed) => {
-                        connection.query(
-                            'INSERT INTO user (username, email, first_name, last_name, password) VALUES ?',
-                            [[[username, email, firstName || '', lastName || '', hashed]]],
-                            (err, {insertId}) => {
-                                connection.release();
-
-                                if (err) {
-                                    sendError(res, ErrorMessage.SOMETHING_WENT_WRONG, 500, err);
-                                    return;
-                                }
-
-                                const token = createToken(insertId);
-                                res.cookie('jwt', token, {httpOnly: true, maxAge: 365 * 24 * 60 * 60});
-
-                                res.status(201).send({id: insertId});
-                            }
-                        );
-                    });
-                } catch (e) {
-                    sendError(res, ErrorMessage.SOMETHING_WENT_WRONG, 500, e);
-                }
+        try {
+            hash(password, (hashed) => {
+                query(res, query2, [[[username, email, firstName || '', lastName || '', hashed]]], ({insertId}) =>
+                    createAndSendToken(res, insertId)
+                );
             });
-        });
+        } catch (e) {
+            sendError(res, ErrorMessage.SOMETHING_WENT_WRONG, 500, e);
+        }
     });
 };
 
@@ -119,42 +71,23 @@ exports.login = (req, res) => {
         return;
     }
 
-    pool.getConnection((err, connection) => {
-        if (err) {
-            sendError(res, ErrorMessage.DATABASE, 500);
+    const query1 = `SELECT * FROM user WHERE ${username ? 'username' : 'email'} = ?`;
+
+    query(res, query1, username ? username : email, (rows) => {
+        if (!rows || rows.length === 0) {
+            sendError(res, ErrorMessage.USER_NOT_FOUND, 404);
             return;
         }
 
-        connection.query(
-            `SELECT * FROM user WHERE ${username ? 'username' : 'email'} = ?`,
-            username ? username : email,
-            (err, rows) => {
-                connection.release();
+        const user = rows[0];
 
-                if (err) {
-                    sendError(res, ErrorMessage.SOMETHING_WENT_WRONG, 500, err);
-                    return;
-                }
-
-                if (!rows || rows.length === 0) {
-                    sendError(res, ErrorMessage.USER_NOT_FOUND, 404);
-                    return;
-                }
-
-                const user = rows[0];
-
-                hashCompare(password, user.password, (err, result) => {
-                    if (err || !result) {
-                        sendError(res, ErrorMessage.AUTHENTICATION_FAILED, 401);
-                        return;
-                    }
-
-                    const token = createToken(user.id);
-                    res.cookie('jwt', token, {httpOnly: true, maxAge: 365 * 24 * 60 * 60});
-
-                    res.send({id: user.id});
-                });
+        hashCompare(password, user.password, (err, result) => {
+            if (err || !result) {
+                sendError(res, ErrorMessage.AUTHENTICATION_FAILED, 401);
+                return;
             }
-        );
+
+            createAndSendToken(res, user.id);
+        });
     });
 };
