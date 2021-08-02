@@ -24,6 +24,6 @@ jobs:
                       sudo git checkout production
                       sudo git pull origin production
                       sudo touch .env
-                      sudo chmod u+x .env
+                      sudo chmod 777 .env
                       sudo echo -en "DB_HOST=localhost\nDB_NAME=spotify_replica\nDB_USER=root\nDB_PASS=1234\nJWT_SECRET=${{secrets.JWT}}" > .env
                       sudo pm2 start app.js
