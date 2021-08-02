@@ -1,28 +1,10 @@
 const {ErrorMessage} = require('../enums/error-message');
 const {Sorter} = require('../enums/sorter');
 
-const {createPool, sendError} = require('../utils/controller-utils');
-
-const pool = createPool();
+const {query, sendError} = require('../utils/controller-utils');
 
 exports.all = (req, res) => {
-    pool.getConnection((err, connection) => {
-        if (err) {
-            sendError(res, ErrorMessage.DATABASE, 500);
-            return;
-        }
-
-        connection.query('SELECT * FROM song', (err, rows) => {
-            connection.release();
-
-            if (err) {
-                sendError(res, ErrorMessage.SOMETHING_WENT_WRONG, 500, err);
-                return;
-            }
-
-            res.json({songs: rows});
-        });
-    });
+    query(res, 'SELECT * FROM song', (rows) => res.json({songs: rows}));
 };
 
 exports.one = (req, res) => {
@@ -33,27 +15,13 @@ exports.one = (req, res) => {
         return;
     }
 
-    pool.getConnection((err, connection) => {
-        if (err) {
-            sendError(res, ErrorMessage.DATABASE, 500);
+    query(res, 'SELECT * FROM song WHERE id = ?', id, (rows) => {
+        if (!rows || rows.length === 0) {
+            sendError(res, ErrorMessage.SONG_NOT_FOUND, 404);
             return;
         }
 
-        connection.query('SELECT * FROM song WHERE id = ?', id, (err, rows) => {
-            connection.release();
-
-            if (err) {
-                sendError(res, ErrorMessage.SOMETHING_WENT_WRONG, 500, err);
-                return;
-            }
-
-            if (!rows || rows.length === 0) {
-                sendError(res, ErrorMessage.SONG_NOT_FOUND, 404);
-                return;
-            }
-
-            res.json({song: rows[0]});
-        });
+        res.json({song: rows[0]});
     });
 };
 
@@ -75,27 +43,8 @@ exports.page = (req, res) => {
         return;
     }
 
-    pool.getConnection((err, connection) => {
-        if (err) {
-            sendError(res, ErrorMessage.DATABASE, 500);
-            return;
-        }
-
-        connection.query(
-            `SELECT * FROM song ORDER BY ${sorter || 'id'} ${!desc ? 'ASC' : 'DESC'} LIMIT ?, ?`,
-            [(current - 1) * size, size],
-            (err, rows) => {
-                connection.release();
-
-                if (err) {
-                    sendError(res, ErrorMessage.SOMETHING_WENT_WRONG, 500, err);
-                    return;
-                }
-
-                res.json({songs: rows});
-            }
-        );
-    });
+    const query1 = `SELECT * FROM song ORDER BY ${sorter || 'id'} ${!desc ? 'ASC' : 'DESC'} LIMIT ?, ?`;
+    query(res, query1, [(current - 1) * size, size], (rows) => res.json({songs: rows}));
 };
 
 exports.find = (req, res) => {
@@ -106,25 +55,6 @@ exports.find = (req, res) => {
         return;
     }
 
-    pool.getConnection((err, connection) => {
-        if (err) {
-            sendError(res, ErrorMessage.DATABASE, 500);
-            return;
-        }
-
-        connection.query(
-            'SELECT * FROM song WHERE CONCAT(name, artist, lyrics) LIKE ? LIMIT 10',
-            `%${phrase}%`,
-            (err, rows) => {
-                connection.release();
-
-                if (err) {
-                    sendError(res, ErrorMessage.SOMETHING_WENT_WRONG, 500, err);
-                    return;
-                }
-
-                res.json({songs: rows});
-            }
-        );
-    });
+    const query1 = 'SELECT * FROM song WHERE CONCAT(name, artist, lyrics) LIKE ? LIMIT 10';
+    query(res, query1, `%${phrase}%`, (rows) => res.json({songs: rows}));
 };
