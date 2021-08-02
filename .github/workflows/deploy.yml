@@ -16,8 +16,9 @@ jobs:
                   key: ${{secrets.SSH_KEY}}
                   port: 22
                   script: |
+                      sudo -i
                       sudo pm2 kill
-                      sudo cd /repos/spotify-replica-server/
+                      cd /repos/spotify-replica-server/
                       sudo git stash
                       sudo git fetch
                       sudo git checkout production
