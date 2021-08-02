@@ -38,7 +38,7 @@ exports.one = (req, res) => {
         'SELECT song.* FROM song, playlist_song WHERE playlist_song.playlist_id = ? AND playlist_song.song_id = song.id';
 
     query(res, query1, id, ErrorMessage.PLAYLIST_NOT_FOUND, () =>
-        query(res, query2, id, (rows) => res.json({name: rows[0].name, songs: rows}))
+        query(res, query2, id, null, (rows) => res.json({name: rows[0].name, songs: rows}))
     );
 };
 
@@ -85,7 +85,7 @@ exports.addSong = (req, res) => {
 
     verifyTokenQuery(req, res, query1, options, ErrorMessage.PLAYLIST_NOT_FOUND, () =>
         query(res, query2, [songId], ErrorMessage.SONG_NOT_FOUND, () =>
-            query(res, query3, [[[playlistId, songId]]], null, () => res.status(201).send())
+            query(res, query3, [[[playlistId, songId]]], null, () => res.send())
         )
     );
 };

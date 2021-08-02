@@ -4,7 +4,7 @@ const {Sorter} = require('../enums/sorter');
 const {query, sendError} = require('../utils/controller-utils');
 
 exports.all = (req, res) => {
-    query(res, 'SELECT * FROM song', [], (rows) => res.json({songs: rows}));
+    query(res, 'SELECT * FROM song', [], null, (rows) => res.json({songs: rows}));
 };
 
 exports.one = (req, res) => {

@@ -85,9 +85,14 @@ module.exports = {
                 },
             },
             SongArray: {
-                type: 'array',
-                items: {
-                    $ref: '#/components/schemas/Song',
+                type: 'object',
+                properties: {
+                    songs: {
+                        type: 'array',
+                        items: {
+                            $ref: '#/components/schemas/Song',
+                        },
+                    },
                 },
             },
             Playlist: {
@@ -98,7 +103,10 @@ module.exports = {
                         example: 'Something',
                     },
                     songs: {
-                        $ref: '#/components/schemas/SongArray',
+                        type: 'array',
+                        items: {
+                            $ref: '#/components/schemas/Song',
+                        },
                     },
                 },
             },

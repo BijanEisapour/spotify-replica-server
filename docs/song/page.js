@@ -19,6 +19,7 @@ module.exports = {
                             },
                             sorter: {
                                 type: 'string',
+                                enum: ['name', 'artist'],
                                 example: 'name',
                             },
                             desc: {

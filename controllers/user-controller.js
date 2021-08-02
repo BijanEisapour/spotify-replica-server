@@ -44,7 +44,7 @@ exports.register = (req, res) => {
         try {
             hash(password, (hashed) => {
                 query(res, query2, [[[username, email, firstName || '', lastName || '', hashed]]], null, ({insertId}) =>
-                    createAndSendToken(res, insertId)
+                    createAndSendToken(res, 201, insertId)
                 );
             });
         } catch (e) {
@@ -72,7 +72,7 @@ exports.login = (req, res) => {
                 return;
             }
 
-            createAndSendToken(res, user.id);
+            createAndSendToken(res, 200, user.id);
         });
     });
 };

@@ -16,11 +16,11 @@ const createPool = () => {
 
 const pool = createPool();
 
-const createAndSendToken = (res, id) => {
+const createAndSendToken = (res, status, id) => {
     const token = jwt.sign({id}, process.env.JWT_SECRET);
     res.cookie('jwt', token, {httpOnly: false, maxAge: 365 * 24 * 60 * 60});
 
-    res.status(201).send({id});
+    res.status(status).send({id});
 };
 
 const hash = (word, callback) => {
