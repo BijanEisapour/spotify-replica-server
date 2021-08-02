@@ -1,5 +1,4 @@
 const express = require('express');
-const cookieParser = require('cookie-parser');
 const cors = require('cors');
 const swaggerUi = require('swagger-ui-express');
 const docs = require('./docs');
@@ -21,7 +20,6 @@ const app = express();
 
 // parse middlewares
 app.use(express.json());
-app.use(cookieParser());
 app.use(cors());
 
 // mysql

@@ -138,6 +138,20 @@ module.exports = {
                     },
                 },
             },
+            tokenObject: {
+                type: 'object',
+                properties: {
+                    id: {
+                        type: 'number',
+                        example: 123,
+                    },
+                    token: {
+                        type: 'string',
+                        example:
+                            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NywiaWF0IjoxNjI3OTEyNzAwfQ.92gveaQ9UGZEEi5epNrhg-2MldXUk9MaI09vUZvCKtU',
+                    },
+                },
+            },
         },
     },
 };
