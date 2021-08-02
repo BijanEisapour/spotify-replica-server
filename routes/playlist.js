@@ -3,6 +3,7 @@ const playlistController = require('../controllers/playlist-controller');
 
 const router = express.Router();
 
+router.get('/all', playlistController.all);
 router.get('/one/:id', playlistController.one);
 
 router.post('/create', playlistController.create);

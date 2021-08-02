@@ -133,7 +133,7 @@ module.exports = {
             PlaylistArray: {
                 type: 'array',
                 items: {
-                    $ref: '#/components/schemas/Song',
+                    $ref: '#/components/schemas/Playlist',
                 },
             },
             Error: {
