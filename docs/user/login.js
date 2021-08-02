@@ -1,5 +1,5 @@
 module.exports = {
-    get: {
+    post: {
         tags: ['user'],
         description: "Logs the user in; At least of the 'username' or 'email' fields has to be present",
         operationId: 'userPostLogin',

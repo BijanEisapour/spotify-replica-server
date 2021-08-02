@@ -1,5 +1,5 @@
 module.exports = {
-    get: {
+    post: {
         tags: ['user'],
         description: 'Registers the user',
         operationId: 'userPostRegister',
