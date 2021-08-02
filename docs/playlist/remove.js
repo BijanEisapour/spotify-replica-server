@@ -1,28 +1,21 @@
 module.exports = {
     post: {
         tags: ['playlist'],
-        description: 'Creates a playlist with given name',
-        operationId: 'playlistPostPage',
+        description: 'Removes a playlist with given id',
+        operationId: 'playlistPostRemove',
         parameters: [
             {
-                name: 'name',
+                name: 'id',
                 in: 'body',
                 schema: {
-                    type: 'string',
+                    $ref: '#/components/schemas/id',
                 },
                 required: true,
             },
         ],
         responses: {
             200: {
-                description: 'Playlist created successfully',
-                content: {
-                    'application/json': {
-                        schema: {
-                            $ref: '#/components/schemas/idObject',
-                        },
-                    },
-                },
+                description: 'Playlist removed successfully',
             },
             400: {
                 description: 'Bad request',
@@ -36,6 +29,16 @@ module.exports = {
             },
             401: {
                 description: 'Unauthorized',
+                content: {
+                    'application/json': {
+                        schema: {
+                            $ref: '#/components/schemas/Error',
+                        },
+                    },
+                },
+            },
+            404: {
+                description: 'Not found',
                 content: {
                     'application/json': {
                         schema: {

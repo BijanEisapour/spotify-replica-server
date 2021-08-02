@@ -137,7 +137,6 @@ exports.login = (req, res) => {
                 connection.release();
 
                 if (err) {
-                    console.log(err);
                     sendError(res, ErrorMessage.SOMETHING_WENT_WRONG, 500, err);
                     return;
                 }

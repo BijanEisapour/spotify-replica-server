@@ -1,6 +1,6 @@
 const {ErrorMessage} = require('../enums/error-message');
 
-const {createPool, createToken, hash, hashCompare, sendError, verifyToken} = require('../utils/controller-utils');
+const {createPool, sendError, verifyToken} = require('../utils/controller-utils');
 
 const pool = createPool();
 
@@ -173,6 +173,208 @@ exports.create = (req, res) => {
                     );
                 });
             });
+        });
+    });
+};
+
+exports.remove = (req, res) => {
+    const {id} = req.body;
+
+    if (!id) {
+        sendError(res, ErrorMessage.PLAYLIST_ID_REQUIRED, 400);
+        return;
+    }
+
+    verifyToken(req, (err, decodedToken) => {
+        if (err) {
+            sendError(res, ErrorMessage.AUTHENTICATION_FAILED, 401);
+            return;
+        }
+
+        const userId = decodedToken.id;
+
+        pool.getConnection((err, connection) => {
+            if (err) {
+                sendError(res, ErrorMessage.DATABASE, 500);
+                return;
+            }
+
+            connection.query(
+                'SELECT * FROM user_playlist WHERE user_id = ? AND playlist_id = ?',
+                [userId, id],
+                (err, rows) => {
+                    connection.release();
+
+                    if (err) {
+                        sendError(res, ErrorMessage.SOMETHING_WENT_WRONG, 500, err);
+                        return;
+                    }
+
+                    if (!rows || rows.length === 0) {
+                        sendError(res, ErrorMessage.PLAYLIST_NOT_FOUND, 404);
+                        return;
+                    }
+
+                    pool.getConnection((err, connection) => {
+                        if (err) {
+                            sendError(res, ErrorMessage.DATABASE, 500);
+                            return;
+                        }
+
+                        connection.query('DELETE FROM playlist WHERE id = ?', id, (err) => {
+                            connection.release();
+
+                            if (err) {
+                                sendError(res, ErrorMessage.SOMETHING_WENT_WRONG, 500, err);
+                                return;
+                            }
+
+                            res.send();
+                        });
+                    });
+                }
+            );
+        });
+    });
+};
+
+exports.addSong = (req, res) => {
+    const {playlistId, songId} = req.body;
+
+    verifyToken(req, (err, decodedToken) => {
+        if (err) {
+            sendError(res, ErrorMessage.AUTHENTICATION_FAILED, 401);
+            return;
+        }
+
+        const userId = decodedToken.id;
+
+        pool.getConnection((err, connection) => {
+            if (err) {
+                sendError(res, ErrorMessage.DATABASE, 500);
+                return;
+            }
+
+            connection.query(
+                'SELECT * FROM user_playlist WHERE user_id = ? AND playlist_id = ?',
+                [userId, playlistId],
+                (err, rows) => {
+                    connection.release();
+
+                    if (err) {
+                        sendError(res, ErrorMessage.SOMETHING_WENT_WRONG, 500, err);
+                        return;
+                    }
+
+                    if (!rows || rows.length === 0) {
+                        sendError(res, ErrorMessage.PLAYLIST_NOT_FOUND, 404);
+                        return;
+                    }
+
+                    pool.getConnection((err, connection) => {
+                        if (err) {
+                            sendError(res, ErrorMessage.DATABASE, 500);
+                            return;
+                        }
+
+                        connection.query('SELECT * FROM song WHERE id = ?', [songId], (err, rows) => {
+                            connection.release();
+
+                            if (err) {
+                                sendError(res, ErrorMessage.SOMETHING_WENT_WRONG, 500, err);
+                                return;
+                            }
+
+                            if (!rows || rows.length === 0) {
+                                sendError(res, ErrorMessage.SONG_NOT_FOUND, 404);
+                                return;
+                            }
+
+                            pool.getConnection((err, connection) => {
+                                if (err) {
+                                    sendError(res, ErrorMessage.DATABASE, 500);
+                                    return;
+                                }
+
+                                connection.query(
+                                    'INSERT INTO playlist_song (playlist_id, song_id) VALUES ?',
+                                    [[[playlistId, songId]]],
+                                    (err) => {
+                                        connection.release();
+
+                                        if (err) {
+                                            sendError(res, ErrorMessage.SOMETHING_WENT_WRONG, 500, err);
+                                            return;
+                                        }
+
+                                        res.status(201).send();
+                                    }
+                                );
+                            });
+                        });
+                    });
+                }
+            );
+        });
+    });
+};
+
+exports.removeSong = (req, res) => {
+    const {playlistId, songId} = req.body;
+
+    verifyToken(req, (err, decodedToken) => {
+        if (err) {
+            sendError(res, ErrorMessage.AUTHENTICATION_FAILED, 401);
+            return;
+        }
+
+        const userId = decodedToken.id;
+
+        pool.getConnection((err, connection) => {
+            if (err) {
+                sendError(res, ErrorMessage.DATABASE, 500);
+                return;
+            }
+
+            connection.query(
+                'SELECT * FROM user_playlist WHERE user_id = ? AND playlist_id = ?',
+                [userId, playlistId],
+                (err, rows) => {
+                    connection.release();
+
+                    if (err) {
+                        sendError(res, ErrorMessage.SOMETHING_WENT_WRONG, 500, err);
+                        return;
+                    }
+
+                    if (!rows || rows.length === 0) {
+                        sendError(res, ErrorMessage.PLAYLIST_NOT_FOUND, 404);
+                        return;
+                    }
+
+                    pool.getConnection((err, connection) => {
+                        if (err) {
+                            sendError(res, ErrorMessage.DATABASE, 500);
+                            return;
+                        }
+
+                        connection.query(
+                            'DELETE FROM playlist_song WHERE playlist_id = ? AND song_id = ?',
+                            [playlistId, songId],
+                            (err) => {
+                                connection.release();
+
+                                if (err) {
+                                    sendError(res, ErrorMessage.SOMETHING_WENT_WRONG, 500, err);
+                                    return;
+                                }
+
+                                res.send();
+                            }
+                        );
+                    });
+                }
+            );
         });
     });
 };
