@@ -5,11 +5,11 @@ const find = require('./find');
 
 module.exports = {
     paths: {
-        '/song/one/{id}': {
-            ...one,
-        },
         '/song/all': {
             ...all,
+        },
+        '/song/one/{id}': {
+            ...one,
         },
         '/song/page': {
             ...page,

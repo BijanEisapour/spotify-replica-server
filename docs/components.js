@@ -6,7 +6,7 @@ module.exports = {
                 properties: {
                     id: {
                         type: 'number',
-                        example: 123,
+                        example: 7,
                     },
                     username: {
                         type: 'string',
@@ -35,7 +35,7 @@ module.exports = {
                 properties: {
                     id: {
                         type: 'number',
-                        example: 123,
+                        example: 7,
                     },
                     username: {
                         type: 'string',

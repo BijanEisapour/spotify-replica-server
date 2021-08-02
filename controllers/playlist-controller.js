@@ -30,6 +30,11 @@ exports.all = (req, res) => {
                         return;
                     }
 
+                    if (!rows || rows.length === 0) {
+                        res.send([]);
+                        return;
+                    }
+
                     pool.getConnection((err, connection) => {
                         if (err) {
                             sendError(res, ErrorMessage.DATABASE, 500);

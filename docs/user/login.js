@@ -3,32 +3,30 @@ module.exports = {
         tags: ['user'],
         description: "Logs the user in; At least of the 'username' or 'email' fields has to be present",
         operationId: 'userPostLogin',
-        parameters: [
-            {
-                name: 'username',
-                in: 'body',
-                schema: {
-                    $ref: '#/components/schemas/username',
+        requestBody: {
+            content: {
+                'application/json': {
+                    schema: {
+                        type: 'object',
+                        properties: {
+                            username: {
+                                type: 'string',
+                                example: 'BijanProgrammer',
+                            },
+                            email: {
+                                type: 'string',
+                                example: 'bijaneisapour@gmail.com',
+                            },
+                            password: {
+                                type: 'string',
+                                example: '1234',
+                            },
+                        },
+                        required: ['password'],
+                    },
                 },
-                required: false,
             },
-            {
-                name: 'email',
-                in: 'body',
-                schema: {
-                    $ref: '#/components/schemas/email',
-                },
-                required: false,
-            },
-            {
-                name: 'password',
-                in: 'body',
-                schema: {
-                    $ref: '#/components/schemas/password',
-                },
-                required: true,
-            },
-        ],
+        },
         responses: {
             200: {
                 description: 'User logged in successfully',

@@ -3,24 +3,26 @@ module.exports = {
         tags: ['playlist'],
         description: 'Adds song to playlist',
         operationId: 'playlistPostAddSong',
-        parameters: [
-            {
-                name: 'playlistId',
-                in: 'body',
-                schema: {
-                    $ref: '#/components/schemas/id',
+        requestBody: {
+            content: {
+                'application/json': {
+                    schema: {
+                        type: 'object',
+                        properties: {
+                            playlistId: {
+                                type: 'number',
+                                example: 5,
+                            },
+                            songId: {
+                                type: 'number',
+                                example: 23,
+                            },
+                        },
+                        required: ['playlistId', 'songId'],
+                    },
                 },
-                required: true,
             },
-            {
-                name: 'songId',
-                in: 'body',
-                schema: {
-                    $ref: '#/components/schemas/id',
-                },
-                required: true,
-            },
-        ],
+        },
         responses: {
             200: {
                 description: 'Song added successfully',

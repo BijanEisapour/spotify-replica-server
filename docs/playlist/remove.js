@@ -3,16 +3,22 @@ module.exports = {
         tags: ['playlist'],
         description: 'Removes a playlist with given id',
         operationId: 'playlistPostRemove',
-        parameters: [
-            {
-                name: 'id',
-                in: 'body',
-                schema: {
-                    $ref: '#/components/schemas/id',
+        requestBody: {
+            content: {
+                'application/json': {
+                    schema: {
+                        type: 'object',
+                        properties: {
+                            id: {
+                                type: 'number',
+                                example: 123,
+                            },
+                        },
+                        required: ['id'],
+                    },
                 },
-                required: true,
             },
-        ],
+        },
         responses: {
             200: {
                 description: 'Playlist removed successfully',

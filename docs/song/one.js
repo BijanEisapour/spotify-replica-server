@@ -8,7 +8,8 @@ module.exports = {
                 name: 'id',
                 in: 'path',
                 schema: {
-                    $ref: '#/components/schemas/id',
+                    type: 'number',
+                    example: 23,
                 },
                 required: true,
             },

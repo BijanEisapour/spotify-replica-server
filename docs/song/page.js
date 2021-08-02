@@ -3,44 +3,34 @@ module.exports = {
         tags: ['song'],
         description: 'Get list of songs with pagination and optional sort',
         operationId: 'songPostPage',
-        parameters: [
-            {
-                name: 'size',
-                in: 'body',
-                schema: {
-                    type: 'number',
-                    example: 20,
+        requestBody: {
+            content: {
+                'application/json': {
+                    schema: {
+                        type: 'object',
+                        properties: {
+                            size: {
+                                type: 'number',
+                                example: 20,
+                            },
+                            current: {
+                                type: 'number',
+                                example: 1,
+                            },
+                            sorter: {
+                                type: 'string',
+                                example: 'name',
+                            },
+                            desc: {
+                                type: 'boolean',
+                                example: true,
+                            },
+                        },
+                        required: ['size', 'current'],
+                    },
                 },
-                required: true,
             },
-            {
-                name: 'current',
-                in: 'body',
-                schema: {
-                    type: 'number',
-                    example: 1,
-                },
-                required: true,
-            },
-            {
-                name: 'sorter',
-                in: 'body',
-                schema: {
-                    type: 'string',
-                    example: 'name',
-                },
-                required: false,
-            },
-            {
-                name: 'desc',
-                in: 'body',
-                schema: {
-                    type: 'boolean',
-                    example: true,
-                },
-                required: false,
-            },
-        ],
+        },
         responses: {
             200: {
                 description: 'List of songs',

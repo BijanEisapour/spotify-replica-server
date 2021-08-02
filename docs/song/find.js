@@ -1,18 +1,24 @@
 module.exports = {
     post: {
         tags: ['song'],
-        description: 'Search for a phrase in name, artist or lyrics',
+        description: 'Search for a phrase in name, artist or lyrics; Returns top 10',
         operationId: 'songPostFind',
-        parameters: [
-            {
-                name: 'phrase',
-                in: 'body',
-                schema: {
-                    type: 'string',
+        requestBody: {
+            content: {
+                'application/json': {
+                    schema: {
+                        type: 'object',
+                        properties: {
+                            phrase: {
+                                type: 'string',
+                                example: 'عشق',
+                            },
+                        },
+                        required: ['phrase'],
+                    },
                 },
-                required: true,
             },
-        ],
+        },
         responses: {
             200: {
                 description: 'List of found songs',

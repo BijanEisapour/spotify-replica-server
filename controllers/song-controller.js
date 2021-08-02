@@ -112,15 +112,19 @@ exports.find = (req, res) => {
             return;
         }
 
-        connection.query('SELECT * FROM song WHERE CONCAT(name, artist, lyrics) LIKE ?', `%${phrase}%`, (err, rows) => {
-            connection.release();
+        connection.query(
+            'SELECT * FROM song WHERE CONCAT(name, artist, lyrics) LIKE ? LIMIT 10',
+            `%${phrase}%`,
+            (err, rows) => {
+                connection.release();
 
-            if (err) {
-                sendError(res, ErrorMessage.SOMETHING_WENT_WRONG, 500, err);
-                return;
+                if (err) {
+                    sendError(res, ErrorMessage.SOMETHING_WENT_WRONG, 500, err);
+                    return;
+                }
+
+                res.json({songs: rows});
             }
-
-            res.json({songs: rows});
-        });
+        );
     });
 };

@@ -3,16 +3,22 @@ module.exports = {
         tags: ['playlist'],
         description: 'Creates a playlist with given name',
         operationId: 'playlistPostPage',
-        parameters: [
-            {
-                name: 'name',
-                in: 'body',
-                schema: {
-                    type: 'string',
+        requestBody: {
+            content: {
+                'application/json': {
+                    schema: {
+                        type: 'object',
+                        properties: {
+                            name: {
+                                type: 'string',
+                                example: 'مورد علاقه‌ها',
+                            },
+                        },
+                        required: ['name'],
+                    },
                 },
-                required: true,
             },
-        ],
+        },
         responses: {
             200: {
                 description: 'Playlist created successfully',
