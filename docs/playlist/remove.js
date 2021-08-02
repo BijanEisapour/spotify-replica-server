@@ -9,12 +9,17 @@ module.exports = {
                     schema: {
                         type: 'object',
                         properties: {
+                            token: {
+                                type: 'string',
+                                example:
+                                    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NywiaWF0IjoxNjI3OTEyNzAwfQ.92gveaQ9UGZEEi5epNrhg-2MldXUk9MaI09vUZvCKtU',
+                            },
                             id: {
                                 type: 'number',
                                 example: 123,
                             },
                         },
-                        required: ['id'],
+                        required: ['token', 'id'],
                     },
                 },
             },

@@ -50,11 +50,6 @@ exports.auth = (req, res) => {
     });
 };
 
-exports.logout = (req, res) => {
-    res.cookie('jwt', '', {maxAge: 1});
-    res.send();
-};
-
 exports.register = (req, res) => {
     const {username, email, firstName, lastName, password} = req.body;
 
@@ -102,7 +97,7 @@ exports.register = (req, res) => {
                                 }
 
                                 const token = createToken(insertId);
-                                res.cookie('jwt', token, {httpOnly: true});
+                                res.cookie('jwt', token, {httpOnly: true, maxAge: 365 * 24 * 60 * 60});
 
                                 res.status(201).send({id: insertId});
                             }
@@ -155,7 +150,7 @@ exports.login = (req, res) => {
                     }
 
                     const token = createToken(user.id);
-                    res.cookie('jwt', token, {httpOnly: true});
+                    res.cookie('jwt', token, {httpOnly: true, maxAge: 365 * 24 * 60 * 60});
 
                     res.send({id: user.id});
                 });

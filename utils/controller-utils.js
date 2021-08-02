@@ -34,7 +34,7 @@ const sendError = (res, message, status, error = 'N/A') => {
 };
 
 const verifyToken = (req, callback) => {
-    const token = req.cookies['jwt'];
+    const {token} = req.body;
 
     if (!token) {
         callback(true);
