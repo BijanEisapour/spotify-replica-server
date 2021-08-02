@@ -10,12 +10,7 @@ exports.one = (req, res) => {
         return;
     }
 
-    query(res, 'SELECT * FROM user WHERE id = ?', id, (rows) => {
-        if (!rows || rows.length === 0) {
-            sendError(res, ErrorMessage.USER_NOT_FOUND, 404);
-            return;
-        }
-
+    query(res, 'SELECT * FROM user WHERE id = ?', id, ErrorMessage.USER_NOT_FOUND, (rows) => {
         const user = rows[0];
         delete user.password;
 
@@ -45,15 +40,10 @@ exports.register = (req, res) => {
     const query1 = 'SELECT * FROM user WHERE username = ? OR email = ?';
     const query2 = 'INSERT INTO user (username, email, first_name, last_name, password) VALUES ?';
 
-    query(res, query1, [username, email], (rows) => {
-        if (rows.length > 0) {
-            sendError(res, ErrorMessage.USER_ALREADY_EXISTS, 400);
-            return;
-        }
-
+    query(res, query1, [username, email], ErrorMessage.USER_ALREADY_EXISTS, () => {
         try {
             hash(password, (hashed) => {
-                query(res, query2, [[[username, email, firstName || '', lastName || '', hashed]]], ({insertId}) =>
+                query(res, query2, [[[username, email, firstName || '', lastName || '', hashed]]], null, ({insertId}) =>
                     createAndSendToken(res, insertId)
                 );
             });
@@ -73,12 +63,7 @@ exports.login = (req, res) => {
 
     const query1 = `SELECT * FROM user WHERE ${username ? 'username' : 'email'} = ?`;
 
-    query(res, query1, username ? username : email, (rows) => {
-        if (!rows || rows.length === 0) {
-            sendError(res, ErrorMessage.USER_NOT_FOUND, 404);
-            return;
-        }
-
+    query(res, query1, username ? username : email, ErrorMessage.USER_NOT_FOUND, (rows) => {
         const user = rows[0];
 
         hashCompare(password, user.password, (err, result) => {

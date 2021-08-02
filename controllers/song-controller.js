@@ -4,7 +4,7 @@ const {Sorter} = require('../enums/sorter');
 const {query, sendError} = require('../utils/controller-utils');
 
 exports.all = (req, res) => {
-    query(res, 'SELECT * FROM song', (rows) => res.json({songs: rows}));
+    query(res, 'SELECT * FROM song', [], (rows) => res.json({songs: rows}));
 };
 
 exports.one = (req, res) => {
@@ -15,14 +15,7 @@ exports.one = (req, res) => {
         return;
     }
 
-    query(res, 'SELECT * FROM song WHERE id = ?', id, (rows) => {
-        if (!rows || rows.length === 0) {
-            sendError(res, ErrorMessage.SONG_NOT_FOUND, 404);
-            return;
-        }
-
-        res.json({song: rows[0]});
-    });
+    query(res, 'SELECT * FROM song WHERE id = ?', id, ErrorMessage.SONG_NOT_FOUND, (rows) => res.json({song: rows[0]}));
 };
 
 exports.page = (req, res) => {
@@ -44,7 +37,7 @@ exports.page = (req, res) => {
     }
 
     const query1 = `SELECT * FROM song ORDER BY ${sorter || 'id'} ${!desc ? 'ASC' : 'DESC'} LIMIT ?, ?`;
-    query(res, query1, [(current - 1) * size, size], (rows) => res.json({songs: rows}));
+    query(res, query1, [(current - 1) * size, size], null, (rows) => res.json({songs: rows}));
 };
 
 exports.find = (req, res) => {
@@ -56,5 +49,5 @@ exports.find = (req, res) => {
     }
 
     const query1 = 'SELECT * FROM song WHERE CONCAT(name, artist, lyrics) LIKE ? LIMIT 10';
-    query(res, query1, `%${phrase}%`, (rows) => res.json({songs: rows}));
+    query(res, query1, `%${phrase}%`, null, (rows) => res.json({songs: rows}));
 };

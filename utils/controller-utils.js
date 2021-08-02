@@ -18,7 +18,7 @@ const pool = createPool();
 
 const createAndSendToken = (res, id) => {
     const token = jwt.sign({id}, process.env.JWT_SECRET);
-    res.cookie('jwt', token, {httpOnly: true, maxAge: 365 * 24 * 60 * 60});
+    res.cookie('jwt', token, {httpOnly: false, maxAge: 365 * 24 * 60 * 60});
 
     res.status(201).send({id});
 };
@@ -36,7 +36,7 @@ const hashCompare = (word, hashed, callback) => {
     bcrypt.compare(word, hashed, callback);
 };
 
-const query = (res, queryString, queryOptions, callback) => {
+const query = (res, queryString, queryOptions, notFound, callback) => {
     pool.getConnection((err, connection) => {
         if (err) {
             sendError(res, ErrorMessage.DATABASE, 500);
@@ -48,6 +48,12 @@ const query = (res, queryString, queryOptions, callback) => {
 
             if (err) {
                 sendError(res, ErrorMessage.SOMETHING_WENT_WRONG, 500, err);
+                return;
+            }
+
+            if (notFound && (!rows || rows.length === 0)) {
+                if (typeof notFound === 'function') notFound();
+                else sendError(res, notFound, 404);
                 return;
             }
 
@@ -71,7 +77,7 @@ const verifyToken = (req, callback) => {
     jwt.verify(token, process.env.JWT_SECRET, callback);
 };
 
-const verifyTokenQuery = (req, res, queryString, queryOptions, callback) => {
+const verifyTokenQuery = (req, res, queryString, queryOptions, notFound, callback) => {
     verifyToken(req, (err, decodedToken) => {
         if (err) {
             sendError(res, ErrorMessage.AUTHENTICATION_FAILED, 401);
@@ -80,12 +86,13 @@ const verifyTokenQuery = (req, res, queryString, queryOptions, callback) => {
 
         const options = typeof queryOptions === 'function' ? queryOptions(decodedToken.id) : queryOptions;
 
-        query(res, queryString, options, (...args) => callback(...args, decodedToken.id));
+        query(res, queryString, options, notFound, (...args) => callback(...args, decodedToken.id));
     });
 };
 
 module.exports = {
     createAndSendToken,
+    createPool,
     hash,
     hashCompare,
     query,
