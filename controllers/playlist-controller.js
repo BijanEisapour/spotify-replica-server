@@ -32,7 +32,6 @@ exports.one = (req, res) => {
             }
 
             const playlist = rows[0];
-            delete playlist.password;
 
             pool.getConnection((err, connection) => {
                 if (err) {
@@ -51,7 +50,7 @@ exports.one = (req, res) => {
                             return;
                         }
 
-                        res.json({songs: rows});
+                        res.json({name: playlist.name, songs: rows});
                     }
                 );
             });

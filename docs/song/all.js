@@ -1,26 +1,16 @@
 module.exports = {
     get: {
-        tags: ['user'],
-        description: 'Checks to see if user has been logged in',
-        operationId: 'userGetAuth',
+        tags: ['song'],
+        description: 'Get list of all songs',
+        operationId: 'songGetAll',
         parameters: [],
         responses: {
             200: {
-                description: 'User is logged in',
+                description: 'List of all songs',
                 content: {
                     'application/json': {
                         schema: {
-                            $ref: '#/components/schemas/idObject',
-                        },
-                    },
-                },
-            },
-            401: {
-                description: 'Authentication failed',
-                content: {
-                    'application/json': {
-                        schema: {
-                            $ref: '#/components/schemas/Error',
+                            $ref: '#/components/schemas/SongArray',
                         },
                     },
                 },

@@ -1,12 +1,21 @@
 module.exports = {
-    get: {
-        tags: ['user'],
-        description: 'Checks to see if user has been logged in',
-        operationId: 'userGetAuth',
-        parameters: [],
+    post: {
+        tags: ['playlist'],
+        description: 'Creates a playlist with given name',
+        operationId: 'songPostPage',
+        parameters: [
+            {
+                name: 'name',
+                in: 'body',
+                schema: {
+                    type: 'string',
+                },
+                required: true,
+            },
+        ],
         responses: {
             200: {
-                description: 'User is logged in',
+                description: 'Playlist created successfully',
                 content: {
                     'application/json': {
                         schema: {
@@ -15,8 +24,8 @@ module.exports = {
                     },
                 },
             },
-            401: {
-                description: 'Authentication failed',
+            400: {
+                description: 'Bad request',
                 content: {
                     'application/json': {
                         schema: {

@@ -79,6 +79,63 @@ module.exports = {
                     },
                 },
             },
+            Song: {
+                type: 'object',
+                properties: {
+                    id: {
+                        type: 'number',
+                        example: 123,
+                    },
+                    name: {
+                        type: 'string',
+                        example: 'Something',
+                    },
+                    artist: {
+                        type: 'string',
+                        example: 'Someone',
+                    },
+                    lyrics: {
+                        type: 'string',
+                        example: 'Lots of things',
+                    },
+                    file: {
+                        type: 'string',
+                        example: 'some url',
+                    },
+                    cover: {
+                        type: 'string',
+                        example: 'some url',
+                    },
+                    liked: {
+                        type: 'boolean',
+                        example: '1',
+                    },
+                },
+            },
+            SongArray: {
+                type: 'array',
+                items: {
+                    $ref: '#/components/schemas/Song',
+                },
+            },
+            Playlist: {
+                type: 'object',
+                properties: {
+                    name: {
+                        type: 'string',
+                        example: 'Something',
+                    },
+                    songs: {
+                        $ref: '#/components/schemas/SongArray',
+                    },
+                },
+            },
+            PlaylistArray: {
+                type: 'array',
+                items: {
+                    $ref: '#/components/schemas/Song',
+                },
+            },
             Error: {
                 type: 'object',
                 properties: {
