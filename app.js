@@ -10,6 +10,7 @@ const PORT = process.env.PORT || 5000;
 const ROUTES = {
     USER: require('./routes/user'),
     SONG: require('./routes/song'),
+    PLAYLIST: require('./routes/playlist'),
 };
 
 // variables
@@ -34,5 +35,6 @@ app.get('', (req, res) => {
 
 app.use('/user', ROUTES.USER);
 app.use('/song', ROUTES.SONG);
+app.use('/playlist', ROUTES.PLAYLIST);
 
 app.listen(PORT, () => console.log(`listening on port ${PORT} ...`));

@@ -29,11 +29,18 @@ const hashCompare = (word, hashed, callback) => {
     bcrypt.compare(word, hashed, callback);
 };
 
-const sendError = (res, message, status) => {
-    res.status(status).send({error: message});
+const sendError = (res, message, status, error = 'N/A') => {
+    res.status(status).send({message, error});
 };
 
-const verifyToken = (token, callback) => {
+const verifyToken = (req, callback) => {
+    const token = req.cookies['jwt'];
+
+    if (!token) {
+        callback(true);
+        return;
+    }
+
     jwt.verify(token, process.env.JWT_SECRET, callback);
 };
 

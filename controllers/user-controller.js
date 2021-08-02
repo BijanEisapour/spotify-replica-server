@@ -22,7 +22,7 @@ exports.one = (req, res) => {
             connection.release();
 
             if (err) {
-                sendError(res, ErrorMessage.SOMETHING_WENT_WRONG, 500);
+                sendError(res, ErrorMessage.SOMETHING_WENT_WRONG, 500, err);
                 return;
             }
 
@@ -40,14 +40,7 @@ exports.one = (req, res) => {
 };
 
 exports.auth = (req, res) => {
-    const token = req.cookies['jwt'];
-
-    if (!token) {
-        sendError(res, ErrorMessage.AUTHENTICATION_FAILED, 401);
-        return;
-    }
-
-    verifyToken(token, (err, decodedToken) => {
+    verifyToken(req, (err, decodedToken) => {
         if (err) {
             sendError(res, ErrorMessage.AUTHENTICATION_FAILED, 401);
             return;
@@ -80,7 +73,7 @@ exports.register = (req, res) => {
             connection.release();
 
             if (err) {
-                sendError(res, ErrorMessage.SOMETHING_WENT_WRONG, 500);
+                sendError(res, ErrorMessage.SOMETHING_WENT_WRONG, 500, err);
                 return;
             }
 
@@ -104,7 +97,7 @@ exports.register = (req, res) => {
                                 connection.release();
 
                                 if (err) {
-                                    sendError(res, ErrorMessage.SOMETHING_WENT_WRONG, 500);
+                                    sendError(res, ErrorMessage.SOMETHING_WENT_WRONG, 500, err);
                                     return;
                                 }
 
@@ -116,7 +109,7 @@ exports.register = (req, res) => {
                         );
                     });
                 } catch (e) {
-                    sendError(res, ErrorMessage.SOMETHING_WENT_WRONG, 500);
+                    sendError(res, ErrorMessage.SOMETHING_WENT_WRONG, 500, e);
                 }
             });
         });
@@ -145,7 +138,7 @@ exports.login = (req, res) => {
 
                 if (err) {
                     console.log(err);
-                    sendError(res, ErrorMessage.SOMETHING_WENT_WRONG, 500);
+                    sendError(res, ErrorMessage.SOMETHING_WENT_WRONG, 500, err);
                     return;
                 }
 

@@ -16,7 +16,7 @@ exports.all = (req, res) => {
             connection.release();
 
             if (err) {
-                sendError(res, ErrorMessage.SOMETHING_WENT_WRONG, 500);
+                sendError(res, ErrorMessage.SOMETHING_WENT_WRONG, 500, err);
                 return;
             }
 
@@ -43,7 +43,7 @@ exports.one = (req, res) => {
             connection.release();
 
             if (err) {
-                sendError(res, ErrorMessage.SOMETHING_WENT_WRONG, 500);
+                sendError(res, ErrorMessage.SOMETHING_WENT_WRONG, 500, err);
                 return;
             }
 
@@ -88,7 +88,7 @@ exports.page = (req, res) => {
                 connection.release();
 
                 if (err) {
-                    sendError(res, ErrorMessage.SOMETHING_WENT_WRONG, 500);
+                    sendError(res, ErrorMessage.SOMETHING_WENT_WRONG, 500, err);
                     return;
                 }
 
@@ -116,7 +116,7 @@ exports.find = (req, res) => {
             connection.release();
 
             if (err) {
-                sendError(res, ErrorMessage.SOMETHING_WENT_WRONG, 500);
+                sendError(res, ErrorMessage.SOMETHING_WENT_WRONG, 500, err);
                 return;
             }
 
