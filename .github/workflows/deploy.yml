@@ -1,0 +1,26 @@
+name: Deployment Workflow
+on:
+    push:
+        branches: [production]
+
+jobs:
+    deply_job:
+        name: Deploy
+        runs-on: ubuntu-latest
+        steps:
+            - name: Establish a Connection to Server and Update Website
+              uses: appleboy/ssh-action@master
+              with:
+                  host: 130.185.120.192
+                  username: ubuntu
+                  key: ${{secrets.SSH_KEY}}
+                  port: 22
+                  script: |
+                      sudo pm2 kill
+                      sudo cd /repos/spotify-replica-server/
+                      sudo git stash
+                      sudo git fetch
+                      sudo git checkout production
+                      sudo git pull origin production
+                      sudo echo -en "DB_HOST=localhost\nDB_NAME=spotify_replica\nDB_USER=root\nDB_PASS=1234\nJWT_SECRET=${{secrets.JWT}}" > .env
+                      sudo pm2 start app.js
