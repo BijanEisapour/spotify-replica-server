@@ -26,7 +26,7 @@ module.exports = {
                 content: {
                     'application/json': {
                         schema: {
-                            $ref: '#/components/schemas/tokenObject',
+                            $ref: '#/components/schemas/idObject',
                         },
                     },
                 },
