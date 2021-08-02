@@ -1,5 +1,7 @@
 const express = require('express');
 const cookieParser = require('cookie-parser');
+const swaggerUi = require('swagger-ui-express');
+const docs = require('./docs');
 
 require('dotenv').config();
 
@@ -36,5 +38,8 @@ app.get('', (req, res) => {
 app.use('/user', ROUTES.USER);
 app.use('/song', ROUTES.SONG);
 app.use('/playlist', ROUTES.PLAYLIST);
+
+// swagger
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(docs));
 
 app.listen(PORT, () => console.log(`listening on port ${PORT} ...`));

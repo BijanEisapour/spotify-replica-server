@@ -78,7 +78,7 @@ exports.register = (req, res) => {
             }
 
             if (rows.length > 0) {
-                sendError(res, ErrorMessage.USER_ALREADY_EXISTS, 404);
+                sendError(res, ErrorMessage.USER_ALREADY_EXISTS, 400);
                 return;
             }
 
