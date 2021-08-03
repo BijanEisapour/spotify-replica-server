@@ -178,6 +178,7 @@ describe('playlist', () => {
         expect(res.type).toEqual(expect.stringContaining('json'));
 
         expect(res.body).toHaveProperty('length');
+        expect(res.body[0]).toHaveProperty('id');
         expect(res.body[0]).toHaveProperty('name');
         expect(res.body[0].name).toEqual('مورد علاقه‌ها');
 

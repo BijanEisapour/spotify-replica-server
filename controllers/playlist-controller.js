@@ -16,7 +16,7 @@ exports.all = (req, res) => {
 
         query(res, query2, [[playlistIds]], null, (rows) => {
             const result = {};
-            playlistIds.forEach((x) => (result[x] = {name: playlists[x], songs: []}));
+            playlistIds.forEach((x) => (result[x] = {id: x, name: playlists[x], songs: []}));
 
             rows.forEach(({playlist_id, ...rest}) => result[playlist_id].songs.push({rest}));
 
