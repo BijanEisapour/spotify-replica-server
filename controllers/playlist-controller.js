@@ -82,10 +82,11 @@ exports.addSong = (req, res) => {
     const query2 = 'SELECT * FROM song WHERE id = ?';
     const query3 = 'INSERT INTO playlist_song (playlist_id, song_id) VALUES ?';
     const options = (x) => [x, playlistId];
+    const errorHandler = () => sendError(res, ErrorMessage.PLAYLIST_SONG_ALREADY_ADDED, 400);
 
     verifyTokenQuery(req, res, query1, options, ErrorMessage.PLAYLIST_NOT_FOUND, () =>
         query(res, query2, [songId], ErrorMessage.SONG_NOT_FOUND, () =>
-            query(res, query3, [[[playlistId, songId]]], null, () => res.send())
+            query(res, query3, [[[playlistId, songId]]], null, errorHandler, () => res.send())
         )
     );
 };

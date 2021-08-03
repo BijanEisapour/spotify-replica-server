@@ -34,7 +34,7 @@ const hashCompare = (word, hashed, callback) => {
     bcrypt.compare(word, hashed, callback);
 };
 
-const query = (res, queryString, queryOptions, notFound, callback) => {
+const query = (res, queryString, queryOptions, notFound, errorHandlerOrCallback, callback) => {
     pool.getConnection((err, connection) => {
         if (err) {
             sendError(res, ErrorMessage.DATABASE, 500);
@@ -45,7 +45,13 @@ const query = (res, queryString, queryOptions, notFound, callback) => {
             connection.release();
 
             if (err) {
-                sendError(res, ErrorMessage.SOMETHING_WENT_WRONG, 500, err);
+                if (callback && errorHandlerOrCallback) {
+                    if (typeof errorHandlerOrCallback === 'function') errorHandlerOrCallback(err);
+                    else sendError(res, errorHandlerOrCallback, 500, err);
+                } else {
+                    sendError(res, ErrorMessage.SOMETHING_WENT_WRONG, 500, err);
+                }
+
                 return;
             }
 
@@ -55,7 +61,8 @@ const query = (res, queryString, queryOptions, notFound, callback) => {
                 return;
             }
 
-            callback(rows);
+            if (callback) callback(rows);
+            else errorHandlerOrCallback(rows);
         });
     });
 };
@@ -75,7 +82,7 @@ const verifyToken = (req, callback) => {
     jwt.verify(token, process.env.JWT_SECRET, callback);
 };
 
-const verifyTokenQuery = (req, res, queryString, queryOptions, notFound, callback) => {
+const verifyTokenQuery = (req, res, queryString, queryOptions, notFound, errorHandlerOrCallback, callback) => {
     verifyToken(req, (err, decodedToken) => {
         if (err) {
             sendError(res, ErrorMessage.AUTHENTICATION_FAILED, 401);
@@ -84,7 +91,13 @@ const verifyTokenQuery = (req, res, queryString, queryOptions, notFound, callbac
 
         const options = typeof queryOptions === 'function' ? queryOptions(decodedToken.id) : queryOptions;
 
-        query(res, queryString, options, notFound, (...args) => callback(...args, decodedToken.id));
+        if (!callback) {
+            query(res, queryString, options, notFound, (...args) => errorHandlerOrCallback(...args, decodedToken.id));
+        } else {
+            query(res, queryString, options, notFound, errorHandlerOrCallback, (...args) =>
+                callback(...args, decodedToken.id)
+            );
+        }
     });
 };
 
