@@ -1,7 +1,7 @@
 module.exports = {
     post: {
         tags: ['song'],
-        description: 'Search for a phrase in name, artist or lyrics; Returns top 10',
+        description: 'Search for a phrase in name, artist or lyrics',
         operationId: 'songPostFind',
         requestBody: {
             content: {
@@ -13,8 +13,21 @@ module.exports = {
                                 type: 'string',
                                 example: 'عشق',
                             },
+                            count: {
+                                type: 'number',
+                                example: 5,
+                            },
+                            sorter: {
+                                type: 'string',
+                                enum: ['name', 'artist'],
+                                example: 'name',
+                            },
+                            desc: {
+                                type: 'boolean',
+                                example: true,
+                            },
                         },
-                        required: ['phrase'],
+                        required: ['phrase', 'count'],
                     },
                 },
             },

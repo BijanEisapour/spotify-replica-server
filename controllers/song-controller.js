@@ -21,12 +21,12 @@ exports.one = (req, res) => {
 exports.page = (req, res) => {
     const {size, current, sorter, desc} = req.body;
 
-    if (size < 1) {
+    if (!size || size < 1) {
         sendError(res, ErrorMessage.PAGE_SIZE_NOT_VALID, 400);
         return;
     }
 
-    if (current < 1) {
+    if (!current || current < 1) {
         sendError(res, ErrorMessage.PAGE_NUMBER_NOT_VALID, 400);
         return;
     }
@@ -41,13 +41,25 @@ exports.page = (req, res) => {
 };
 
 exports.find = (req, res) => {
-    const {phrase} = req.body;
+    const {phrase, count, sorter, desc} = req.body;
 
     if (!phrase) {
         sendError(res, ErrorMessage.SEARCH_PHRASE_NOT_VALID, 400);
         return;
     }
 
-    const query1 = 'SELECT * FROM song WHERE CONCAT(name, artist, lyrics) LIKE ? LIMIT 10';
-    query(res, query1, `%${phrase}%`, null, (rows) => res.json({songs: rows}));
+    if (!count || count < 1) {
+        sendError(res, ErrorMessage.COUNT_NOT_VALID, 400);
+        return;
+    }
+
+    if (sorter && !Object.values(Sorter).includes(sorter)) {
+        sendError(res, ErrorMessage.SORTER_NOT_VALID, 400);
+        return;
+    }
+
+    const query1 = `SELECT * FROM song WHERE CONCAT(name, artist, lyrics) LIKE ? ORDER BY ${sorter || 'id'} ${
+        !desc ? 'ASC' : 'DESC'
+    } LIMIT ?`;
+    query(res, query1, [`%${phrase}%`, count], null, (rows) => res.json({songs: rows}));
 };
