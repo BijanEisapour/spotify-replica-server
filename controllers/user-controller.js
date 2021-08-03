@@ -40,7 +40,12 @@ exports.register = (req, res) => {
     const query1 = 'SELECT * FROM user WHERE username = ? OR email = ?';
     const query2 = 'INSERT INTO user (username, email, first_name, last_name, password) VALUES ?';
 
-    query(res, query1, [username, email], ErrorMessage.USER_ALREADY_EXISTS, () => {
+    query(res, query1, [username, email], null, (rows) => {
+        if (rows.length > 0) {
+            sendError(res, ErrorMessage.USER_ALREADY_EXISTS, 400);
+            return;
+        }
+
         try {
             hash(password, (hashed) => {
                 query(res, query2, [[[username, email, firstName || '', lastName || '', hashed]]], null, ({insertId}) =>
