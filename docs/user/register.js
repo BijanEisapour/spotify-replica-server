@@ -36,7 +36,7 @@ module.exports = {
             },
         },
         responses: {
-            200: {
+            201: {
                 description: 'User created successfully',
                 content: {
                     'application/json': {
