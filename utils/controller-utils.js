@@ -86,6 +86,10 @@ const sendError = (res, message, status, error = 'N/A') => {
     res.status(status).send({message, error});
 };
 
+const snakeCase = (word) => {
+    return word.replace(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`);
+};
+
 const tryCatch = async (res, callback) => {
     try {
         await callback();
@@ -113,7 +117,6 @@ const verifyTokenQuery = async (req, res, queryString, queryOptions, notFound, e
     try {
         decodedToken = await verifyToken(req);
     } catch (err) {
-        console.log('here');
         sendError(res, ErrorMessage.AUTHENTICATION_FAILED, 401);
         throw err;
     }
@@ -129,6 +132,7 @@ module.exports = {
     hashCompare,
     query,
     sendError,
+    snakeCase,
     tryCatch,
     verifyToken,
     verifyTokenQuery,

@@ -3,6 +3,7 @@ const ErrorMessage = {
     USER_ID_REQUIRED: 'ارسال آیدی کاربر اجباری است',
     USER_NOT_FOUND: 'کاربر مورد نظر یافت نشد',
     USER_ALL_CREDENTIALS_REQUIRED: 'لطفاً تمام موارد مورد نیاز را بفرستید',
+    USER_AT_LEAST_ONE_FIELD_REQUIRED: 'حداقل مقدار یکی از فیلدها باید ارسال شود',
     USER_ALREADY_EXISTS: 'کاربری با این مشخصات از قبل موجود است',
     SONG_ID_REQUIRED: 'ارسال آیدی آهنگ اجباری است',
     SONG_NOT_FOUND: 'آهنگ مورد نظر یافت نشد',

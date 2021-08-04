@@ -2,6 +2,7 @@ const one = require('./one');
 const auth = require('./auth');
 const register = require('./register');
 const login = require('./login');
+const alter = require('./alter');
 
 module.exports = {
     paths: {
@@ -16,6 +17,9 @@ module.exports = {
         },
         '/user/login': {
             ...login,
+        },
+        '/user/alter': {
+            ...alter,
         },
     },
 };

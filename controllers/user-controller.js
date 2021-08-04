@@ -6,8 +6,10 @@ const {
     hashCompare,
     query,
     sendError,
+    snakeCase,
     tryCatch,
     verifyToken,
+    verifyTokenQuery,
 } = require('../utils/controller-utils');
 
 exports.one = async (req, res) => {
@@ -77,5 +79,33 @@ exports.login = async (req, res) => {
 
         await hashCompare(res, password, user.password);
         createAndSendToken(res, 200, user.id);
+    });
+};
+
+exports.alter = async (req, res) => {
+    const fields = ['username', 'email', 'firstName', 'lastName', 'password', 'avatar', 'gender', 'birthDate'];
+    const validFields = fields.filter((f) => !!req.body[f]);
+
+    if (validFields.length === 0) {
+        sendError(res, ErrorMessage.USER_AT_LEAST_ONE_FIELD_REQUIRED, 400);
+        return;
+    }
+
+    const query1 = 'SELECT * FROM user WHERE id = ?';
+    const options = (x) => x;
+
+    let query2 = 'UPDATE user SET';
+    validFields.forEach((f) => (query2 += ` ${snakeCase(f)} = ?,`));
+    query2 = query2.slice(0, query2.length - 1);
+    query2 += ' WHERE id = ?';
+
+    if (req.body.password) req.body.password = await hash(req.body.password);
+    const values = validFields.map((f) => req.body[f]);
+
+    await tryCatch(res, async () => {
+        const [, id] = await verifyTokenQuery(req, res, query1, options, ErrorMessage.USER_NOT_FOUND);
+        await query(res, query2, [...values, id]);
+
+        res.send();
     });
 };
