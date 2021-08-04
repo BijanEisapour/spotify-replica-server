@@ -1,4 +1,4 @@
-const {requestWithSupertest, token} = require('./server');
+const {requestWithSupertest, token} = require('./index');
 
 describe('user', () => {
     it('GET one', async () => {

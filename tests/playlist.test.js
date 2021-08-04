@@ -1,4 +1,4 @@
-const {requestWithSupertest, toBeSong, token} = require('./server');
+const {requestWithSupertest, toBeSong, token} = require('./index');
 
 describe('playlist', () => {
     it('GET one', async () => {
@@ -8,7 +8,7 @@ describe('playlist', () => {
         expect(res.type).toEqual(expect.stringContaining('json'));
 
         expect(res.body).toHaveProperty('name');
-        expect(res.body.name).toEqual('جنگه دلم');
+        expect(res.body.name).toEqual('Collection');
 
         expect(res.body).toHaveProperty('songs');
         expect(res.body.songs).toHaveProperty('length');

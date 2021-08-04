@@ -1,4 +1,4 @@
-const {requestWithSupertest, toBeSong} = require('./server');
+const {requestWithSupertest, toBeSong} = require('./index');
 
 describe('song', () => {
     it('GET all', async () => {
