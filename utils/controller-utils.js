@@ -34,35 +34,40 @@ const hashCompare = (word, hashed, callback) => {
     bcrypt.compare(word, hashed, callback);
 };
 
-const query = (res, queryString, queryOptions, notFound, errorHandlerOrCallback, callback) => {
-    pool.getConnection((err, connection) => {
-        if (err) {
-            sendError(res, ErrorMessage.DATABASE, 500);
-            return;
-        }
-
-        connection.query(queryString, queryOptions, (err, rows) => {
-            connection.release();
-
+const query = async (res, queryString, queryOptions, notFound, errorHandler) => {
+    return new Promise((resolve, reject) => {
+        pool.getConnection((err, connection) => {
             if (err) {
-                if (callback && errorHandlerOrCallback) {
-                    if (typeof errorHandlerOrCallback === 'function') errorHandlerOrCallback(err);
-                    else sendError(res, errorHandlerOrCallback, 500, err);
-                } else {
-                    sendError(res, ErrorMessage.SOMETHING_WENT_WRONG, 500, err);
+                sendError(res, ErrorMessage.DATABASE, 500);
+                reject();
+                return;
+            }
+
+            connection.query(queryString, queryOptions, (err, rows) => {
+                connection.release();
+
+                if (err) {
+                    if (errorHandler) {
+                        if (typeof errorHandler === 'function') errorHandler(err);
+                        else sendError(res, errorHandler, 500, err);
+                    } else {
+                        sendError(res, ErrorMessage.SOMETHING_WENT_WRONG, 500, err);
+                    }
+
+                    reject();
+                    return;
                 }
 
-                return;
-            }
+                if (notFound && (!rows || rows.length === 0)) {
+                    if (typeof notFound === 'function') notFound();
+                    else sendError(res, notFound, 404);
 
-            if (notFound && (!rows || rows.length === 0)) {
-                if (typeof notFound === 'function') notFound();
-                else sendError(res, notFound, 404);
-                return;
-            }
+                    reject();
+                    return;
+                }
 
-            if (callback) callback(rows);
-            else errorHandlerOrCallback(rows);
+                resolve(rows);
+            });
         });
     });
 };
@@ -71,34 +76,35 @@ const sendError = (res, message, status, error = 'N/A') => {
     res.status(status).send({message, error});
 };
 
-const verifyToken = (req, callback) => {
-    const {token} = req.body;
+const verifyToken = (req) => {
+    return new Promise((resolve, reject) => {
+        const {token} = req.body;
 
-    if (!token) {
-        callback(true);
-        return;
-    }
-
-    jwt.verify(token, process.env.JWT_SECRET, callback);
-};
-
-const verifyTokenQuery = (req, res, queryString, queryOptions, notFound, errorHandlerOrCallback, callback) => {
-    verifyToken(req, (err, decodedToken) => {
-        if (err) {
-            sendError(res, ErrorMessage.AUTHENTICATION_FAILED, 401);
+        if (!token) {
+            reject();
             return;
         }
 
-        const options = typeof queryOptions === 'function' ? queryOptions(decodedToken.id) : queryOptions;
-
-        if (!callback) {
-            query(res, queryString, options, notFound, (...args) => errorHandlerOrCallback(...args, decodedToken.id));
-        } else {
-            query(res, queryString, options, notFound, errorHandlerOrCallback, (...args) =>
-                callback(...args, decodedToken.id)
-            );
-        }
+        jwt.verify(token, process.env.JWT_SECRET, (err, decodedToken) => {
+            if (err) reject(err);
+            else resolve(decodedToken);
+        });
     });
+};
+
+const verifyTokenQuery = async (req, res, queryString, queryOptions, notFound, errorHandler) => {
+    let decodedToken;
+
+    try {
+        decodedToken = await verifyToken(req);
+    } catch (err) {
+        console.log('here');
+        sendError(res, ErrorMessage.AUTHENTICATION_FAILED, 401);
+        throw err;
+    }
+
+    const options = typeof queryOptions === 'function' ? queryOptions(decodedToken.id) : queryOptions;
+    return [await query(res, queryString, options, notFound, errorHandler), decodedToken.id];
 };
 
 module.exports = {
