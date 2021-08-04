@@ -1,4 +1,4 @@
-const {requestWithSupertest, toBeSong, token} = require('./index');
+const {requestWithSupertest, token} = require('./index');
 
 describe('playlist', () => {
     it('GET one', async () => {
@@ -12,8 +12,6 @@ describe('playlist', () => {
 
         expect(res.body).toHaveProperty('songs');
         expect(res.body.songs).toHaveProperty('length');
-        expect(res.body.songs.length).toBeGreaterThan(0);
-        toBeSong(res.body.songs[0]);
     });
 
     it('POST all', async () => {

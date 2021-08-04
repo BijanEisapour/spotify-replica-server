@@ -9,11 +9,11 @@ describe('song', () => {
 
         expect(res.body).toHaveProperty('songs');
         expect(res.body.songs).toHaveProperty('length');
-        expect(res.body.songs.length).toEqual(387);
+        expect(res.body.songs.length).toEqual(268);
     });
 
     it('GET one', async () => {
-        const res = await requestWithSupertest.get('/song/one/23');
+        const res = await requestWithSupertest.get('/song/one/1');
 
         expect(res.status).toEqual(200);
         expect(res.type).toEqual(expect.stringContaining('json'));
