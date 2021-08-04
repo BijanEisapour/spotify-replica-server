@@ -1,15 +1,13 @@
 const {ErrorMessage} = require('../enums/error-message');
 const {Sorter} = require('../enums/sorter');
 
-const {query, sendError} = require('../utils/controller-utils');
+const {query, sendError, tryCatch} = require('../utils/controller-utils');
 
 exports.all = async (req, res) => {
-    try {
+    await tryCatch(res, async () => {
         const songs = await query(res, 'SELECT * FROM song', []);
         res.json({songs});
-    } catch {
-        // ignored
-    }
+    });
 };
 
 exports.one = async (req, res) => {
@@ -20,12 +18,10 @@ exports.one = async (req, res) => {
         return;
     }
 
-    try {
+    await tryCatch(res, async () => {
         const songs = await query(res, 'SELECT * FROM song WHERE id = ?', id, ErrorMessage.SONG_NOT_FOUND);
         res.json({song: songs[0]});
-    } catch {
-        // ignored
-    }
+    });
 };
 
 exports.page = async (req, res) => {
@@ -48,12 +44,10 @@ exports.page = async (req, res) => {
 
     const query1 = `SELECT * FROM song ORDER BY ${sorter || 'id'} ${!desc ? 'ASC' : 'DESC'} LIMIT ?, ?`;
 
-    try {
+    await tryCatch(res, async () => {
         const songs = await query(res, query1, [(current - 1) * size, size]);
         res.json({songs});
-    } catch {
-        // ignored
-    }
+    });
 };
 
 exports.find = async (req, res) => {
@@ -78,10 +72,8 @@ exports.find = async (req, res) => {
         !desc ? 'ASC' : 'DESC'
     } LIMIT ?`;
 
-    try {
+    await tryCatch(res, async () => {
         const songs = await query(res, query1, [`%${phrase}%`, count]);
         res.json({songs});
-    } catch {
-        // ignored
-    }
+    });
 };

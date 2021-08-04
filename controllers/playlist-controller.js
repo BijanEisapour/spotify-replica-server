@@ -1,6 +1,6 @@
 const {ErrorMessage} = require('../enums/error-message');
 
-const {query, sendError, verifyTokenQuery} = require('../utils/controller-utils');
+const {query, sendError, tryCatch, verifyTokenQuery} = require('../utils/controller-utils');
 
 exports.all = async (req, res) => {
     const query1 = 'SELECT playlist.* FROM user_playlist, playlist WHERE user_id = ? AND playlist_id = playlist.id';
@@ -8,7 +8,7 @@ exports.all = async (req, res) => {
     const options = (x) => x;
     const notFound = () => res.send([]);
 
-    try {
+    await tryCatch(res, async () => {
         let [rows] = await verifyTokenQuery(req, res, query1, options, notFound);
         const playlists = {};
         rows.forEach((x) => (playlists[x.id] = x.name));
@@ -21,9 +21,7 @@ exports.all = async (req, res) => {
         rows.forEach(({playlist_id, ...rest}) => result[playlist_id].songs.push({rest}));
 
         res.send(Object.values(result));
-    } catch {
-        // ignored
-    }
+    });
 };
 
 exports.one = async (req, res) => {
@@ -38,14 +36,12 @@ exports.one = async (req, res) => {
     const query2 =
         'SELECT song.* FROM song, playlist_song WHERE playlist_song.playlist_id = ? AND playlist_song.song_id = song.id';
 
-    try {
+    await tryCatch(res, async () => {
         const playlists = await query(res, query1, id, ErrorMessage.PLAYLIST_NOT_FOUND);
         const songs = await query(res, query2, id);
 
         res.json({name: playlists[0].name, songs});
-    } catch {
-        // ignored
-    }
+    });
 };
 
 exports.create = async (req, res) => {
@@ -59,14 +55,12 @@ exports.create = async (req, res) => {
     const query1 = 'INSERT INTO playlist (name) VALUES ?';
     const query2 = 'INSERT INTO user_playlist (user_id, playlist_id) VALUES ?';
 
-    try {
+    await tryCatch(res, async () => {
         const [{insertId}, userId] = await verifyTokenQuery(req, res, query1, [[[name]]]);
         await query(res, query2, [[[userId, insertId]]]);
 
         res.status(201).send({id: insertId});
-    } catch {
-        // ignored
-    }
+    });
 };
 
 exports.remove = async (req, res) => {
@@ -81,13 +75,11 @@ exports.remove = async (req, res) => {
     const query2 = 'DELETE FROM playlist WHERE id = ?';
     const options = (x) => [x, id];
 
-    try {
+    await tryCatch(res, async () => {
         await verifyTokenQuery(req, res, query1, options, ErrorMessage.PLAYLIST_NOT_FOUND);
         await query(res, query2, id);
         res.send();
-    } catch {
-        // ignored
-    }
+    });
 };
 
 exports.addSong = async (req, res) => {
@@ -99,15 +91,13 @@ exports.addSong = async (req, res) => {
     const options = (x) => [x, playlistId];
     const errorHandler = () => sendError(res, ErrorMessage.PLAYLIST_SONG_ALREADY_ADDED, 400);
 
-    try {
+    await tryCatch(res, async () => {
         await verifyTokenQuery(req, res, query1, options, ErrorMessage.PLAYLIST_NOT_FOUND);
         await query(res, query2, [songId], ErrorMessage.SONG_NOT_FOUND);
         await query(res, query3, [[[playlistId, songId]]], null, errorHandler);
 
         res.send();
-    } catch {
-        // ignored
-    }
+    });
 };
 
 exports.removeSong = async (req, res) => {
@@ -117,12 +107,10 @@ exports.removeSong = async (req, res) => {
     const query2 = 'DELETE FROM playlist_song WHERE playlist_id = ? AND song_id = ?';
     const options = (x) => [x, playlistId];
 
-    try {
+    await tryCatch(res, async () => {
         await verifyTokenQuery(req, res, query1, options, ErrorMessage.PLAYLIST_NOT_FOUND);
         await query(req, query2, [playlistId, songId]);
 
         res.send();
-    } catch {
-        // ignored
-    }
+    });
 };
