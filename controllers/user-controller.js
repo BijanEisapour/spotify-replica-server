@@ -31,10 +31,13 @@ exports.one = async (req, res) => {
 };
 
 exports.auth = async (req, res) => {
-    await tryCatch(res, async () => {
+    try {
         const {id} = await verifyToken(req);
         res.send({id});
-    });
+    } catch (err) {
+        sendError(res, ErrorMessage.AUTHENTICATION_FAILED, 401);
+        throw err;
+    }
 };
 
 exports.register = async (req, res) => {
