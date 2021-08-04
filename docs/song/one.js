@@ -9,7 +9,7 @@ module.exports = {
                 in: 'path',
                 schema: {
                     type: 'number',
-                    example: 23,
+                    example: 1,
                 },
                 required: true,
             },

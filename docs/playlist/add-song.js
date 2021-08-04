@@ -20,7 +20,7 @@ module.exports = {
                             },
                             songId: {
                                 type: 'number',
-                                example: 23,
+                                example: 1,
                             },
                         },
                         required: ['token', 'playlistId', 'songId'],
