@@ -37,8 +37,8 @@ exports.one = (req, res) => {
     const query2 =
         'SELECT song.* FROM song, playlist_song WHERE playlist_song.playlist_id = ? AND playlist_song.song_id = song.id';
 
-    query(res, query1, id, ErrorMessage.PLAYLIST_NOT_FOUND, () =>
-        query(res, query2, id, null, (rows) => res.json({name: rows[0].name, songs: rows}))
+    query(res, query1, id, ErrorMessage.PLAYLIST_NOT_FOUND, (playlists) =>
+        query(res, query2, id, null, (songs) => res.json({name: playlists[0].name, songs}))
     );
 };
 
