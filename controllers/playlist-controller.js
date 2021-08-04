@@ -40,7 +40,7 @@ exports.one = async (req, res) => {
 
     try {
         const playlists = await query(res, query1, id, ErrorMessage.PLAYLIST_NOT_FOUND);
-        const songs = await query(res, query2, id, null);
+        const songs = await query(res, query2, id);
 
         res.json({name: playlists[0].name, songs});
     } catch {
