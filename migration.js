@@ -6,6 +6,8 @@ const {query} = require('./utils/controller-utils');
 
 const SONGS_FOLDER_PATH = './public/files/songs/';
 const COVERS_FOLDER_PATH = './public/files/covers/';
+const SONGS_DOWNLOAD_PATH = 'https://songs.code-star.ir/files/songs/';
+const COVERS_DOWNLOAD_PATH = 'https://songs.code-star.ir/files/covers/';
 
 const MIN_PUBLISH_DATE = new Date(2019, 1, 1);
 const MAX_PUBLISH_DATE = new Date(2021, 7, 28);
@@ -81,8 +83,8 @@ const downloadAndRelink = async () => {
                     console.log(`downloaded cover ${song.id}`);
 
                     await query(res, 'UPDATE song SET file = ?, cover = ? WHERE id = ?', [
-                        songPath,
-                        coverPath,
+                        SONGS_DOWNLOAD_PATH + songFileName,
+                        COVERS_DOWNLOAD_PATH + coverFileName,
                         song.id,
                     ]);
                 });
