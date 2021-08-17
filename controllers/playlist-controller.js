@@ -18,7 +18,7 @@ exports.all = async (req, res) => {
         playlistIds.forEach((x) => (result[x] = {id: x, name: playlists[x], songs: []}));
 
         rows = await query(res, query2, [[playlistIds]]);
-        rows.forEach(({playlist_id, ...rest}) => result[playlist_id].songs.push({rest}));
+        rows.forEach(({playlist_id, ...rest}) => result[playlist_id].songs.push(rest));
 
         res.send(Object.values(result));
     });
